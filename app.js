@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+//var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -12,16 +12,7 @@ var users = require('./routes/users');
 var auth = require('./routes/auth');
 
 var app = express();
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-passport.use(new GoogleStrategy({
-  clientID: '131990906356-mu6q59ver90mtgih8upq3k6tp2pg90v5.apps.googleusercontent.com',
-  clientSecret: '8BX8gnwnX5w9BDVCSWkmSDig',
-  callbackURL: 'http://localhost:3000/auth/google/callback'},
-  function (req, accessToken, refreshToken, profile, done) {
-  done(null, profile);
-}
-));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,24 +20,18 @@ app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+//app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({secret: 'anything'}));
 
-app.use(passport.initialize());
-app.use(passport.session());
+require('./config/passport')(app);
 
-passport.serializeUser(function(user, done){
-  done(null, user);
-});
 
-passport.deserializeUser(function(user, done){
-  done(null, user);
-});
 
 app.use('/', routes);
 app.use('/users', users);
